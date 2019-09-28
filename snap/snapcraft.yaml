@@ -1,0 +1,39 @@
+name: gphotos-sync
+base: core18 
+adopt-info: gphotos-sync
+summary: Google Photos Sync
+description: |
+  Google Photos Sync.
+
+grade: stable
+confinement: strict
+
+parts:
+  gphotos-sync:
+    plugin: python
+    source: https://github.com/gilesknap/gphotos-sync.git
+    override-pull: |
+      snapcraftctl pull
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      echo $last_committed_tag
+      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "beta:" { print $2 }')"
+      echo $last_released_tag
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+        echo "Setting version to $last_committed_tag"
+        snapcraftctl set-version "${last_committed_tag}"
+      else
+        echo "Setting version to $(git rev-parse --short HEAD)"
+        snapcraftctl set-version "$(git rev-parse --short HEAD)"
+      fi
+
+apps:
+  gphotos-sync:
+    command: gphotos-sync
+    plugs:
+      - home
+      - network
+      - removable-media
