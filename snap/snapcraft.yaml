@@ -37,3 +37,4 @@ apps:
       - home
       - network
       - removable-media
+      - mount-observe
