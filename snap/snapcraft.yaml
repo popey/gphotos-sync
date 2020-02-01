@@ -33,6 +33,8 @@ parts:
 apps:
   gphotos-sync:
     command: gphotos-sync
+    environment:
+      LANG: C.UTF-8
     plugs:
       - home
       - network
